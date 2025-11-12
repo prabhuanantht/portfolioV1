@@ -1,0 +1,17 @@
+
+{
+  "name": "Ananth Prabhu T Portfolio",
+  "short_name": "AP Portfolio",
+  "description": "Portfolio website of Ananth Prabhu T, a software engineering student at NIE Mysuru specializing in AI/ML and full-stack development.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7fafc",
+  "theme_color": "#2662d9",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

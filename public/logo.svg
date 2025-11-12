@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="98" height="65" viewBox="0 0 98 65" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%"  stop-color="#103767"/>
+      <stop offset="50%" stop-color="#227EF0"/>
+      <stop offset="100%" stop-color="#1E6DCF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Transparent background (none) -->
+  <rect width="100%" height="100%" fill="none"/>
+
+  <!-- Text centered -->
+  <text x="49" y="48"
+        text-anchor="middle"
+        font-family="Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+        font-weight="700"
+        font-size="44"
+        fill="url(#g)"
+        letter-spacing="0.5">
+    AP.
+  </text>
+</svg>
