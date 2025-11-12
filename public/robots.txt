@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://ananthprabhu.dev/sitemap.xml
+Sitemap: https://ananthprabhut.vercel.app/sitemap.xml

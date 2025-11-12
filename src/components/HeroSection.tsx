@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail, Code2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Links } from "@/data/links";
 import DeveloperBoard from "./DeveloperBoard";
@@ -149,6 +149,7 @@ const HeroSection = () => {
                 { icon: Github, link: Links.github, label: "GitHub" },
                 { icon: Linkedin, link: Links.linkedin, label: "LinkedIn" },
                 { icon: Mail, link: Links.email, label: "Email" },
+                { icon: Code2, link: Links.codolio, label: "Codolio Profile" },
               ].map((social, index) => (
                 <motion.a
                   key={index}

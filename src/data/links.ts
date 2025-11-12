@@ -2,6 +2,7 @@ export const Links = {
     github: "https://github.com/prabhuanantht",
     linkedin: "https://linkedin.com/in/prabhuanantht",
     email: "mailto:prabhuanantht@gmail.com",
+    codolio: "https://codolio.com/profile/ananthprabhut",
     resume: "https://drive.google.com/file/d/1fR8yCBKKkCo29OH0uUh59gsKw4gIBGUd/view?usp=sharing",
     emailonly: "prabhuanantht@gmail.com",
     location: "Mysuru, India",
