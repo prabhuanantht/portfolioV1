@@ -12,7 +12,7 @@ export const skillCategories: SkillCategory[] = [
   {
     name: "Programming Languages",
     icon: Terminal,
-    skills: ["C++", "Python", "C", "Java"],
+    skills: ["C++", "Python", "C", "Java", "TypeScript", "JavaScript"],
   },
   {
     name: "AI & Machine Learning",
@@ -24,8 +24,12 @@ export const skillCategories: SkillCategory[] = [
       "NLP",
       "BERT",
       "RAG",
-      "LangChain",
-      "LangGraph",
+      "CNNs",
+      "RNNs",
+      "LSTM",
+      "GRU",
+      "Transformers",
+      "Autoencoders"
     ],
   },
   {
@@ -45,14 +49,23 @@ export const skillCategories: SkillCategory[] = [
   {
     name: "Databases",
     icon: Database,
-    skills: ["MySQL", "MongoDB", "CosmosDB", "ChromaDB", "Qdrant"],
+    skills: [
+      "MySQL",
+      "MongoDB",
+      "CosmosDB",
+      "ChromaDB",
+      "Qdrant",
+      "Redis",
+      "PostgreSQL",
+      "Prisma",
+      "SQLite",
+      "Firebase"],
   },
   {
     name: "Tools & Technologies",
     icon: Layout,
     skills: [
       "Docker",
-      "Redis",
       "Kafka",
       "Git & GitHub",
       "Node.js",
@@ -64,13 +77,12 @@ export const skillCategories: SkillCategory[] = [
     name: "AI Tools & Frameworks",
     icon: Palette,
     skills: [
-      "CodeBERT",
       "Gemini",
-      "Sentence Transformers",
-      "NetworkX",
+      "LangGraph",
+      "LangChain",
+      "CrewAI",
       "n8n",
       "Vapi",
-      "Twilio",
     ],
   },
 ];

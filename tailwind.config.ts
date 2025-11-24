@@ -12,27 +12,27 @@ export default {
 	prefix: "",
 	theme: {
 		fontFamily: {
-      sans: [
-        '"InterVariable"', 
-        '"Inter var"', 
-        'ui-sans-serif', 
-        'system-ui',
-        '-apple-system',
-        'BlinkMacSystemFont',
-        'sans-serif'
-      ],
-	  mono: [
-        'Roboto Mono',
-        'ui-monospace',
-        'SFMono-Regular',
-        'Menlo',
-        'Monaco',
-        'Consolas',
-        'Liberation Mono',
-        'Courier New',
-        'monospace'
-      ],
-    },
+			sans: [
+				'"InterVariable"',
+				'"Inter var"',
+				'ui-sans-serif',
+				'system-ui',
+				'-apple-system',
+				'BlinkMacSystemFont',
+				'sans-serif'
+			],
+			mono: [
+				'Roboto Mono',
+				'ui-monospace',
+				'SFMono-Regular',
+				'Menlo',
+				'Monaco',
+				'Consolas',
+				'Liberation Mono',
+				'Courier New',
+				'monospace'
+			],
+		},
 		container: {
 			center: true,
 			padding: '2rem',
@@ -93,6 +93,10 @@ export default {
 				sm: 'calc(var(--radius) - 4px)'
 			},
 			keyframes: {
+				marquee: {
+					'0%': { transform: 'translateX(0)' },
+					'100%': { transform: 'translateX(-50%)' },
+				},
 				'accordion-down': {
 					from: { height: '0' },
 					to: { height: 'var(--radix-accordion-content-height)' }
@@ -119,9 +123,10 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out forwards',
 				'fade-in-right': 'fade-in-right 0.5s ease-out forwards',
-				'slide-up': 'slide-up 0.5s ease-out forwards'
+				'slide-up': 'slide-up 0.5s ease-out forwards',
+				marquee: 'marquee 80s linear infinite',
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;

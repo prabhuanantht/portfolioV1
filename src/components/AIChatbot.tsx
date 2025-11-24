@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, X, Send, Bot } from "lucide-react";
+import { X, Send, Sparkles, Bot, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getPortfolioContext } from "@/lib/portfolio-context";
+import ReactMarkdown from "react-markdown";
 
 type Message = {
   role: "user" | "assistant";
@@ -20,6 +22,7 @@ const AIChatbot = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [thinkingStep, setThinkingStep] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -28,63 +31,22 @@ const AIChatbot = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, thinkingStep]);
 
-  const contextAboutAnanth = `
-You are an AI assistant representing Ananth Prabhu T. Here's what you need to know:
+  const simulateThinking = async () => {
+    const steps = [
+      "Reading Ananth's bio...",
+      "Analyzing your request...",
+      "Checking project details...",
+      "Formulating response...",
+    ];
 
-BASIC INFO:
-- Name: Ananth Prabhu T
-- Location: Mysuru, India
-- Email: prabhuanantht@gmail.com
-- Phone: +91 8105385164
-- GitHub: github.com/prabhuanantht
-- LinkedIn: linkedin.com/in/prabhuanantht
-
-EDUCATION:
-- BE in Information Science & Engineering at The National Institute of Engineering, Mysuru (2022-Present)
-- CGPA: 9.56/10
-- Class XII (PCMB) - CBSE: 95.4% from Jawahar Navodaya Vidyalaya, Udupi
-- Class X - CBSE: 91% from Jawahar Navodaya Vidyalaya, Udupi
-
-EXPERIENCE:
-1. Summer Intern at Apollo Global Management Inc., Mumbai (July 2025 - Sep 2025)
-   - Designed AI-powered data analysis platform with Angular, FastAPI, CosmosDB, reducing manual analysis by ~70%
-   - Built AI agents using n8n, LangGraph, reducing workflows by ~40%
-
-2. Machine Learning Intern at Avanti Fellows (Nov 2024 - Jan 2025)
-   - Built ML models with 85% accuracy for student classification
-
-3. Data Intern at Avanti Fellows (Nov 2023 - Feb 2024)
-   - Optimized databases, boosted efficiency by 50%
-
-SKILLS:
-- Programming: C++, Python, C, Java
-- AI/ML: Deep Learning, NLP, BERT, RAG, LangChain, LangGraph, GAN
-- Web Development: Django, FastAPI, Flask, Streamlit, Next.js, Angular, Tailwind CSS
-- Databases: MySQL, MongoDB, CosmosDB, ChromaDB, Qdrant
-- Tools: Docker, Redis, Kafka, Git, Azure Kubernetes, AWS S3
-- AI Tools: CodeBERT, Gemini, Sentence Transformers, NetworkX
-
-TOP PROJECTS:
-1. CodeSensei - Multi-AI agent system for codebase analysis with RAG pipeline
-2. NextHire - AI-powered job platform with BERT semantic similarity
-3. Suraksha.AI - Digital fraud detection platform (SAP HackFest'25 National Finalists)
-4. SafeDriveAI - ML-based ADAS software (Qualcomm VisionX Runner-up, 2nd globally among 450+ teams)
-
-ACHIEVEMENTS:
-- SAP HackFest'25: National Finalists & State-Hub Winners
-- Qualcomm VisionX Hackathon (IIT Bombay): Runners-up (2nd globally among 450+ teams)
-- Sparc 2024 AI Hackathon: Winners
-- Multiple certifications: Deep Learning (Coursera), Google Cybersecurity, FLY Scholar (CMI, USA)
-
-PERSONALITY:
-- Not limited to any tech stack - proficient in vibecoding and AI-assisted coding
-- Interested in chess (still learning, not a grandmaster yet 😄) - Profile: chess.com/member/frozenfire051
-- Passionate about building impactful AI solutions
-
-Answer questions naturally and conversationally. Be enthusiastic about Ananth's work and achievements!
-`;
+    for (const step of steps) {
+      setThinkingStep(step);
+      // Random delay between 500ms and 1000ms
+      await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 500));
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -94,14 +56,19 @@ Answer questions naturally and conversationally. Be enthusiastic about Ananth's 
     setInput("");
     setIsLoading(true);
 
+    // Start thinking simulation in background
+    const thinkingPromise = simulateThinking();
+
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      
+
       if (!apiKey) {
         throw new Error("Gemini API key not configured. Please add VITE_GEMINI_API_KEY to your .env file.");
       }
 
-      const response = await fetch(
+      const context = getPortfolioContext();
+
+      const apiCallPromise = fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
@@ -113,7 +80,7 @@ Answer questions naturally and conversationally. Be enthusiastic about Ananth's 
               {
                 parts: [
                   {
-                    text: `${contextAboutAnanth}\n\nUser question: ${input}\n\nProvide a helpful, friendly response about Ananth. Keep it concise (2-3 sentences max unless asked for details).`,
+                    text: `${context}\n\nUser question: ${input}\n\nProvide a helpful, friendly response about Ananth.`,
                   },
                 ],
               },
@@ -122,12 +89,14 @@ Answer questions naturally and conversationally. Be enthusiastic about Ananth's 
         }
       );
 
+      // Wait for both thinking simulation and API call
+      const [_, response] = await Promise.all([thinkingPromise, apiCallPromise]);
+
       const data = await response.json();
-      
+
       if (!response.ok) {
-        // Handle quota exceeded error specifically
         if (data.error?.code === 429) {
-          throw new Error("API quota exceeded. Please create a new Gemini API key at makersuite.google.com or wait a few minutes.");
+          throw new Error("API quota exceeded. Please create a new Gemini API key or wait a few minutes.");
         }
         throw new Error(data.error?.message || "Failed to get response");
       }
@@ -146,37 +115,54 @@ Answer questions naturally and conversationally. Be enthusiastic about Ananth's 
         ...prev,
         {
           role: "assistant",
-          content: error.message?.includes("API key") 
+          content: error.message?.includes("API key")
             ? "Oops! The chatbot isn't configured yet. The developer needs to add the Gemini API key. Feel free to check out Ananth's resume or GitHub in the meantime! 😊"
             : "Sorry, I encountered an error. Please try again or reach out directly via email!",
         },
       ]);
     } finally {
       setIsLoading(false);
+      setThinkingStep("");
     }
   };
+
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 300);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <>
       {/* Floating Chat Button */}
       <motion.div
-        className="fixed bottom-28 right-8 z-40"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 1, type: "spring", stiffness: 260, damping: 20 }}
+        className="fixed right-8 z-50"
+        initial={{ bottom: "2rem", scale: 0 }} // 2rem = bottom-8
+        animate={{
+          bottom: isScrolled ? "6rem" : "2rem", // Move up when scrolled (6rem = bottom-24)
+          scale: 1
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 260,
+          damping: 20,
+          bottom: { duration: 0.3 } // Smooth transition for position
+        }}
       >
         <Button
           onClick={() => setIsOpen(!isOpen)}
-          className="rounded-full w-16 h-16 shadow-2xl hover:shadow-3xl transition-all hover:scale-110 p-0 flex items-center justify-center"
+          className="rounded-full w-12 h-12 shadow-lg hover:shadow-xl transition-all hover:scale-105 p-0 flex items-center justify-center bg-primary text-primary-foreground"
           aria-label="Open AI Chatbot"
         >
           {isOpen ? (
-            <X strokeWidth={1.75} className="!w-9 !h-9" style={{ width: '24px', height: '24px' }} />
+            <X className="w-6 h-6" />
           ) : (
-            <div className="relative flex items-center justify-center">
-              <MessageCircle strokeWidth={1.75} className="!w-9 !h-9" style={{ width: '16px', height: '16px' }} />
-              <span className="absolute text-xs" style={{ marginTop: '-1px' }}></span>
-            </div>
+            <Sparkles className="w-8 h-8" />
           )}
         </Button>
       </motion.div>
@@ -185,55 +171,68 @@ Answer questions naturally and conversationally. Be enthusiastic about Ananth's 
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-48 right-8 w-96 h-[500px] bg-card border border-border rounded-lg shadow-2xl z-40 flex flex-col"
+            className="fixed right-8 w-[90vw] md:w-96 h-[500px] max-h-[80vh] bg-card border border-border rounded-xl shadow-2xl z-50 flex flex-col overflow-hidden"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              bottom: isScrolled ? "10.5rem" : "6.5rem" // Adjust window position too
+            }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
           >
             {/* Header */}
-            <div className="bg-primary text-primary-foreground p-4 rounded-t-lg flex items-center gap-3">
-              <Bot className="h-5 w-5" />
+            <div className="bg-primary p-4 flex items-center gap-3 text-primary-foreground">
+              <div className="bg-primary-foreground/20 p-2 rounded-full">
+                <Bot className="h-5 w-5" />
+              </div>
               <div>
-                <h3 className="font-semibold">Curious? Let's talk tech!!!</h3>
-                <p className="text-xs opacity-90">Ananth's AI Corner</p>
+                <h3 className="font-semibold text-sm">Ananth's AI Assistant</h3>
+                <p className="text-xs opacity-90">Ask me anything!</p>
               </div>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-background/50">
               {messages.map((message, index) => (
                 <div
                   key={index}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
+                    }`}
                 >
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-foreground"
-                    }`}
+                    className={`max-w-[85%] p-3 rounded-2xl text-sm ${message.role === "user"
+                      ? "bg-primary text-primary-foreground rounded-br-none"
+                      : "bg-muted text-foreground rounded-bl-none"
+                      }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    {message.role === "assistant" ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-secondary/50 prose-pre:text-secondary-foreground text-foreground">
+                        <ReactMarkdown
+                          components={{
+                            a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-4 hover:text-primary/80" />,
+                            p: ({ node, ...props }) => <p {...props} className="text-foreground" />,
+                            li: ({ node, ...props }) => <li {...props} className="text-foreground" />,
+                            strong: ({ node, ...props }) => <strong {...props} className="text-foreground font-semibold" />,
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                    )}
                   </div>
                 </div>
               ))}
+
+              {/* Thinking Indicator */}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-muted p-3 rounded-lg">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                      <div
-                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 bg-primary rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      ></div>
-                    </div>
+                  <div className="bg-muted p-3 rounded-2xl rounded-bl-none flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground animate-pulse">{thinkingStep}</span>
                   </div>
                 </div>
               )}
@@ -241,7 +240,7 @@ Answer questions naturally and conversationally. Be enthusiastic about Ananth's 
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t">
+            <div className="p-3 border-t bg-card">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -254,9 +253,9 @@ Answer questions naturally and conversationally. Be enthusiastic about Ananth's 
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about projects, skills..."
                   disabled={isLoading}
-                  className="flex-1"
+                  className="flex-1 bg-background border-input focus-visible:ring-primary"
                 />
-                <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+                <Button type="submit" size="icon" disabled={isLoading || !input.trim()} className="shrink-0">
                   <Send className="h-4 w-4" />
                 </Button>
               </form>

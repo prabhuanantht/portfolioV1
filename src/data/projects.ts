@@ -67,4 +67,15 @@ export const projects: Project[] = [
       live: "",
     },
   },
+  {
+    id: 6,
+    title: "AI Interviewer",
+    description: "An Agentic AI Interviewer with reasoning abilities. Features real-time feedback, adaptive questions, and personalized feedback report.",
+    image: "/imgs/p6.png",
+    tags: ["Next.js", "TypeScript", "Gemini", "Agentic AI", "Agent Workflows"],
+    links: {
+      github: "https://github.com/prabhuanantht/interviewer-ai",
+      live: "https://ai-interview-xi-ten.vercel.app/",
+    },
+  },
 ];

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Github, Linkedin, Mail, MapPin, Phone } from "lucide-react";
+import { Github, Linkedin, Mail, MapPin, Phone, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Links } from "@/data/links";
 
@@ -28,15 +28,18 @@ const ContactSection = () => {
     setIsSubmitting(true);
 
     const formPayload = {
-      access_key: "531fd131-bf09-4970-b27a-9538b544d544",
+      _captcha: "false",
+      _template: "table",
+      _subject: `New submission from ${formData.name}: ${formData.subject}`,
       ...formData,
     };
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch(`https://formsubmit.co/ajax/${Links.emailonly}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(formPayload),
       });
@@ -60,7 +63,7 @@ const ContactSection = () => {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to send message",
+        description: "Failed to send message. Please try again later.",
         variant: "destructive",
       });
     } finally {
@@ -72,10 +75,18 @@ const ContactSection = () => {
     <section id="contact" className=" bg-background">
       <div className="section-container">
         <h2 className="section-heading">Get In Touch</h2>
-        <p className="text-muted-foreground max-w-2xl mb-12">
-          Have a question or want to work together? Feel free to drop me a
-          message. I'd love to hear from you!
-        </p>
+        <div className="flex flex-col items-start gap-6 mb-12">
+          <p className="text-muted-foreground max-w-2xl">
+            Have a question or want to work together? Feel free to drop me a
+            message. I'd love to hear from you!
+          </p>
+          <Button asChild className="gap-2">
+            <a href={Links.resume} target="_blank" rel="noopener noreferrer">
+              <FileText className="w-4 h-4" />
+              Download Resume
+            </a>
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-1 space-y-8">
@@ -161,17 +172,6 @@ const ContactSection = () => {
               className="space-y-6 bg-card p-6 rounded-lg shadow-sm border border-border"
               onSubmit={handleSubmit}
             >
-              {/* ⚠️ UPDATE THIS WITH YOUR OWN KEY FROM web3forms.com */}
-              <input
-                type="hidden"
-                name="access_key"
-                value="531fd131-bf09-4970-b27a-9538b544d544"
-              />
-              <input
-                type="hidden"
-                name="redirect"
-                value="https://web3forms.com/success"
-              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
