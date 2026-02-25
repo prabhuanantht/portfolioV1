@@ -3,7 +3,6 @@ BASIC INFO:
 - Name: Ananth Prabhu T
 - Location: Mysuru, India
 - Email: prabhuanantht@gmail.com
-- Phone: +91 8105385164
 - GitHub: github.com/prabhuanantht
 - LinkedIn: linkedin.com/in/prabhuanantht
 
